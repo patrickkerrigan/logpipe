@@ -7,7 +7,15 @@ void LogReader::addWriter(LogWriter *writer) {
 
 void LogReader::read() {
     for (std::string line; std::getline(std::cin, line);) {
-        logWriter.write(line);
+        writeLine(line);
+    }
+
+    flushWriters();
+}
+
+void LogReader::flushWriters() const {
+    for (const auto &writer : writers) {
+        writer->flush();
     }
 }
 

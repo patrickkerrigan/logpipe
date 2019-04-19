@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <string>
 #include <aws/core/Aws.h>
 #include <aws/logs/CloudWatchLogsClient.h>
@@ -9,15 +8,16 @@
 
 using namespace std;
 
-class AwsLogWriter : LogWriter {
+class AwsLogWriter : public LogWriter {
 private:
     Aws::CloudWatchLogs::CloudWatchLogsClient client;
     string logGroup;
     string logStream;
+    bool realTime;
     string sequenceToken;
     EventQueue batch;
 
-    static Aws::Client::ClientConfiguration getClientConfig();
+    static Aws::Client::ClientConfiguration getClientConfig(string region);
 
     void createLogGroupIfNotExists();
     void createLogStream();
@@ -25,7 +25,7 @@ private:
     void flushBatch();
     void putEvents(int attempt = 1);
 public:
-    AwsLogWriter(string logGroup, string logStream);
+    AwsLogWriter(string region, string logGroup, string logStream, bool realTime);
     ~AwsLogWriter();
     void write(string) override;
     void flush() override;

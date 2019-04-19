@@ -9,18 +9,19 @@
 
 using namespace std;
 
-Aws::Client::ClientConfiguration AwsLogWriter::getClientConfig() {
+Aws::Client::ClientConfiguration AwsLogWriter::getClientConfig(string region) {
     Aws::Client::ClientConfiguration clientConfig;
-    clientConfig.region = "eu-west-1";
+    clientConfig.region = region;
 
     return clientConfig;
 }
 
-AwsLogWriter::AwsLogWriter(string logGroup, string logStream) :
-    client(getClientConfig())
+AwsLogWriter::AwsLogWriter(string region, string logGroup, string logStream, bool realTime) :
+    client(getClientConfig(region))
 {
     this->logGroup = logGroup;
     this->logStream = logStream;
+    this->realTime = realTime;
     this->sequenceToken = "";
 
     createLogGroupIfNotExists();
@@ -34,6 +35,10 @@ void AwsLogWriter::write(string message) {
     if (!batch.addEvent(message, timestamp)) {
         flushBatch();
         batch.addEvent(message, timestamp);
+    }
+
+    if (realTime) {
+        flushBatch();
     }
 }
 
