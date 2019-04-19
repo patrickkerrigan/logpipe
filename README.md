@@ -1,4 +1,4 @@
-#logpipe
+# logpipe
 
 A utility for piping the output of commands to AWS CloudWatch Logs.
 
